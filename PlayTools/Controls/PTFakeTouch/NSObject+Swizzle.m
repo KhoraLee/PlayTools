@@ -90,6 +90,7 @@
         }
 
         if ([[PlaySettings shared] refreshRate] == 120){
+         [objc_getClass("UIScreen") swizzleInstanceMethod:@selector(maximumFramesPerSecond) withMethod:@selector(hook_maxFPS)];
          [objc_getClass("UnityAppController") swizzleInstanceMethod:@selector(callbackFramerateChange:) withMethod:@selector(hook_callbackFramerateChange:)];
         }
 
@@ -113,7 +114,7 @@
 
 - (void) hook_callbackFramerateChange:(int)targetFPS {
     printf("FPS %d", targetFPS);
-    [self hook_callbackFramerateChange:120];
+    [self hook_callbackFramerateChange:(int) [[PlaySettings shared] refreshRate]];
 }
 
 - (MTLPixelFormat) hook_stencilAttachmentPixelFormat {
@@ -143,6 +144,10 @@
 
 - (CGSize) hook_size {
     return [PlayScreen sizeAspectRatio:[self hook_size]];
+}
+
+- (NSInteger) hook_maxFPS {
+    return [[PlaySettings shared] refreshRate] ;
 }
 
 bool menuWasCreated = false;

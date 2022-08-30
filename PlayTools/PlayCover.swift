@@ -23,6 +23,9 @@ final public class PlayCover: NSObject {
         quitWhenClose()
         PlayInput.shared.initialize()
         DiscordIPC.shared.initailize()
+        delay(5) {
+            print("[PlayTools] Max UI FPS : %d", UIScreen.main.maximumFramesPerSecond)
+        }
     }
 
     @objc static public func quitWhenClose() {
