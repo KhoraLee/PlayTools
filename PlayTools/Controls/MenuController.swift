@@ -5,6 +5,7 @@
  Menu construction extensions for this sample.
  */
 
+import AVKit
 import UIKit
 
 extension UIViewController {
@@ -27,6 +28,11 @@ extension UIViewController {
     func downscaleElement(_ sender: AnyObject) {
         EditorController.shared.focusedControl?.resize(down: true)
     }
+    
+    @objc
+    func forcePIP(_ sender: AnyObject) {
+        PlayCover.pipController?.startPictureInPicture()
+    }
 }
 
 struct CommandsList {
@@ -36,11 +42,13 @@ struct CommandsList {
 var keymapping = ["Open/Close Keymapping Editor",
                   "Delete selected element",
                   "Upsize selected element",
-                  "Downsize selected element"]
+                  "Downsize selected element",
+                  "Force enable PIP"]
 var keymappingSelectors = [#selector(UIViewController.switchEditorMode(_:)),
                            #selector(UIViewController.removeElement(_:)),
                            #selector(UIViewController.upscaleElement(_:)),
-                           #selector(UIViewController.downscaleElement(_:))]
+                           #selector(UIViewController.downscaleElement(_:)),
+                           #selector(UIViewController.forcePIP(_:))]
 
 class MenuController {
     init(with builder: UIMenuBuilder) {
@@ -48,11 +56,11 @@ class MenuController {
             builder.insertSibling(MenuController.keymappingMenu(), afterMenu: .view)
         }
     }
-
+    
     @available(iOS 15.0, *)
     class func keymappingMenu() -> UIMenu {
-        let keyCommands = [ "K", UIKeyCommand.inputDelete, UIKeyCommand.inputUpArrow, UIKeyCommand.inputDownArrow ]
-
+        let keyCommands = [ "K", UIKeyCommand.inputDelete, UIKeyCommand.inputUpArrow, UIKeyCommand.inputDownArrow, "P" ]
+        
         let arrowKeyChildrenCommands = zip(keyCommands, keymapping).map { (command, btn) in
             UIKeyCommand(title: btn,
                          image: nil,
@@ -62,13 +70,13 @@ class MenuController {
                          propertyList: [CommandsList.KeymappingToolbox: btn]
             )
         }
-
+        
         let arrowKeysGroup = UIMenu(title: "",
                                     image: nil,
                                     identifier: .keymappingOptionsMenu,
                                     options: .displayInline,
                                     children: arrowKeyChildrenCommands)
-
+        
         return UIMenu(title: NSLocalizedString("Keymapping", comment: ""),
                       image: nil,
                       identifier: .keymappingMenu,
